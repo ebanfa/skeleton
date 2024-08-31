@@ -3,6 +3,7 @@ package common
 import (
 	"context"
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 )
@@ -81,9 +82,9 @@ func (c *Context) WithPluginPaths(paths ...string) *Context {
 func (c *Context) WithTraceID(traceID string) *Context {
 	newCtx := &Context{
 		Context: c.Context,
-		values:  c.values,
+		values:  make(map[interface{}]interface{}),
 	}
-
+	maps.Copy(newCtx.values, c.values)
 	newCtx.values["traceID"] = traceID
 	return newCtx
 }

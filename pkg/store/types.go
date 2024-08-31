@@ -1,9 +1,10 @@
 package store
 
-import (
-	cosLogApi "cosmossdk.io/log"
-	"github.com/cosmos/iavl"
-	dbm "github.com/cosmos/iavl/db"
+import "errors"
+
+// Create a new error
+var (
+	ErrStoreNotFound = errors.New("Store not found")
 )
 
 // ReadOnlyDatabase provides methods for reading data from the database.
@@ -78,34 +79,13 @@ type Database interface {
 	Close() error
 }
 
-// DatabaseFactory is an interface for creating databases.
-type DatabaseFactory interface {
-	// CreateDatabase creates and initializes a database instance with the given name and path.
-	CreateDatabase(name, path string) (Database, error)
-}
+// Store represents a database store.
+type Store interface {
+	Database
 
-// IAVLDatabaseFactory is a concrete implementation of the DatabaseFactory interface
-// that creates IAVL database instances.
-type IAVLDatabaseFactory struct {
-	DatabaseFactory
-}
+	// Name returns the name of the store.
+	Name() string
 
-// NewIAVLDatabaseFactory creates a new instance of IAVLDatabaseFactory with the given DB creator function.
-func NewIAVLDatabaseFactory() *IAVLDatabaseFactory {
-	return &IAVLDatabaseFactory{}
-}
-
-// CreateDatabase creates and initializes an IAVL database instance with the given name and path.
-func (f *IAVLDatabaseFactory) CreateDatabase(name, path string) (Database, error) {
-	// Initialize the LevelDB instance
-	ldb, err := dbm.NewGoLevelDB(name, path)
-	if err != nil {
-		return nil, err
-	}
-
-	// Initialize the IAVLDB instance
-	iavlTree := iavl.NewMutableTree(dbm.NewPrefixDB(ldb, []byte("s/k:main/")), 100, false, cosLogApi.NewNopLogger())
-	iavlDB := NewIAVLDatabase(iavlTree)
-
-	return iavlDB, nil
+	// Path returns the path of the store.
+	Path() string
 }
