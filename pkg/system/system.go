@@ -5,122 +5,37 @@ import (
 	"sync"
 
 	"github.com/ebanfa/skeleton/pkg/common"
-	"github.com/ebanfa/skeleton/pkg/store"
-)
-
-// SystemComponentInterface represents a component in the system.
-type SystemComponentInterface interface {
-	ComponentInterface
-
-	// Initialize initializes the module.
-	// Returns an error if the initialization fails.
-	Initialize(ctx *common.Context, system SystemInterface) error
-}
-
-// SystemServiceInterface represents a service within the system.
-type SystemServiceInterface interface {
-	StartableInterface
-	SystemComponentInterface
-}
-
-// SystemOperationInput represents the input data for an operation.
-type SystemOperationInput struct {
-	// Data is the input data for the operation.
-	Data interface{}
-}
-
-// SystemOperationOutput represents the response data from an operation.
-type SystemOperationOutput struct {
-	// Data is the response data from the operation.
-	Data interface{}
-}
-
-// SystemOperation represents a unit of work that can be executed.
-type SystemOperationInterface interface {
-	SystemComponentInterface
-
-	// Execute performs the operation with the given context and input parameters,
-	// and returns any output or error encountered.
-	Execute(ctx *common.Context, input *SystemOperationInput) (*SystemOperationOutput, error)
-}
-
-// SystemInterface represents the core system in the application.
-type SystemInterface interface {
-	BootableInterface
-	StartableInterface
-
-	// Logger returns the system logger.
-	Logger() common.LoggerInterface
-
-	// EventBus returns the system event bus.
-	EventBus() common.EventBusInterface
-
-	// Configuration returns the system configuration.
-	Configuration() *Configuration
-
-	// ComponentRegistry returns the component registry
-	ComponentRegistry() ComponentRegistrarInterface
-
-	// MultiStore returns the multi-level store used by the system, which is a store of stores.
-	MultiStore() store.MultiStore
-
-	// PluginManager returns the plugin manager
-	PluginManager() PluginManagerInterface
-
-	// ExecuteOperation executes the operation with the given ID and input data.
-	// Returns the output of the operation and an error if the operation is not found or if execution fails.
-	ExecuteOperation(ctx *common.Context, operationID string, data *SystemOperationInput) (*SystemOperationOutput, error)
-
-	// StartService starts the service with the given ID.
-	// Returns an error if the service ID is not found or other error.
-	StartService(ctx *common.Context, serviceID string) error
-
-	// StopService stops the service with the given ID.
-	// Returns an error if the service ID is not found or other error.
-	StopService(ctx *common.Context, serviceID string) error
-
-	// RestartService restarts the service with the given ID.
-	// Returns an error if the service ID is not found or other error.
-	RestartService(ctx *common.Context, serviceID string) error
-}
-
-// System status.
-type SystemStatusType int
-
-const (
-	SystemInitializedType SystemStatusType = iota
-	SystemStartedType
-	SystemStoppedType
+	"github.com/ebanfa/skeleton/pkg/types"
 )
 
 // SystemImpl represents the core system in the application.
 type SystemImpl struct {
-	SystemInterface
+	types.SystemInterface
 	mutex         sync.RWMutex
-	configuration *Configuration
-	componentReg  ComponentRegistrarInterface
+	configuration *types.Configuration
+	componentReg  types.ComponentRegistrarInterface
 	logger        common.LoggerInterface
 	eventBus      common.EventBusInterface
-	pluginManager PluginManagerInterface
-	status        SystemStatusType
-	store         store.MultiStore
+	pluginManager types.PluginManagerInterface
+	status        types.SystemStatusType
+	store         types.MultiStore
 }
 
 // NewSystem creates a new instance of the SystemImpl.
 func NewSystem(
 	logger common.LoggerInterface,
 	eventBus common.EventBusInterface,
-	configuration *Configuration,
-	pluginManager PluginManagerInterface,
-	componentReg ComponentRegistrarInterface,
-	store store.MultiStore) *SystemImpl {
+	configuration *types.Configuration,
+	pluginManager types.PluginManagerInterface,
+	componentReg types.ComponentRegistrarInterface,
+	store types.MultiStore) *SystemImpl {
 	return &SystemImpl{
 		logger:        logger,
 		eventBus:      eventBus,
 		componentReg:  componentReg,
 		configuration: configuration,
 		pluginManager: pluginManager,
-		status:        SystemStoppedType,
+		status:        types.SystemStoppedType,
 		store:         store,
 	}
 }
@@ -136,22 +51,22 @@ func (s *SystemImpl) EventBus() common.EventBusInterface {
 }
 
 // Configuration returns the system configuration.
-func (s *SystemImpl) Configuration() *Configuration {
+func (s *SystemImpl) Configuration() *types.Configuration {
 	return s.configuration
 }
 
 // ComponentRegistry returns the component registry.
-func (s *SystemImpl) ComponentRegistry() ComponentRegistrarInterface {
+func (s *SystemImpl) ComponentRegistry() types.ComponentRegistrarInterface {
 	return s.componentReg
 }
 
 // MultiStore returns the multistore
-func (s *SystemImpl) MultiStore() store.MultiStore {
+func (s *SystemImpl) MultiStore() types.MultiStore {
 	return s.store
 }
 
 // ComponentRegistry returns the component registry.
-func (s *SystemImpl) PluginManager() PluginManagerInterface {
+func (s *SystemImpl) PluginManager() types.PluginManagerInterface {
 	return s.pluginManager
 }
 
@@ -159,9 +74,9 @@ func (s *SystemImpl) PluginManager() PluginManagerInterface {
 func (s *SystemImpl) Initialize(ctx *common.Context) error {
 	// Override this function to customize system initialization
 
-	s.status = SystemInitializedType
-	s.pluginManager.Initialize(ctx, s)
-	return nil
+	s.status = types.SystemInitializedType
+
+	return s.pluginManager.Initialize(ctx, s)
 }
 
 // Start starts the system component along with all registered services.
@@ -169,8 +84,8 @@ func (s *SystemImpl) Start(ctx *common.Context) error {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	if s.status != SystemInitializedType {
-		return ErrSystemNotInitialized
+	if s.status != types.SystemInitializedType {
+		return types.ErrSystemNotInitialized
 	}
 
 	if err := s.pluginManager.StartPlugins(ctx); err != nil {
@@ -178,7 +93,7 @@ func (s *SystemImpl) Start(ctx *common.Context) error {
 		s.logger.Log(common.LevelError, "Error starting plugin:", err)
 		return err
 	}
-	s.status = SystemStartedType
+	s.status = types.SystemStartedType
 	return nil
 }
 
@@ -187,16 +102,16 @@ func (s *SystemImpl) Stop(ctx *common.Context) error {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	if s.status != SystemStartedType {
-		return ErrSystemNotStarted
+	if s.status != types.SystemStartedType {
+		return types.ErrSystemNotStarted
 	}
 	// Retrieve all components of type ServiceType
-	components := s.ComponentRegistry().GetComponentsByType(ServiceType)
+	components := s.ComponentRegistry().GetComponentsByType(types.ServiceType)
 
 	// Iterate over each service component and start it
 	for _, service := range components {
 		// Check if the component implements SystemServiceInterface
-		systemService, ok := service.(SystemServiceInterface)
+		systemService, ok := service.(types.SystemServiceInterface)
 		if !ok {
 			return fmt.Errorf("failed to start service: component %v is not a service", service)
 		}
@@ -208,13 +123,13 @@ func (s *SystemImpl) Stop(ctx *common.Context) error {
 		}
 	}
 
-	s.status = SystemStoppedType
+	s.status = types.SystemStoppedType
 	return nil
 }
 
 // ExecuteOperation executes the operation with the given ID and input data.
 // Returns the output of the operation and an error if the operation is not found or if execution fails.
-func (s *SystemImpl) ExecuteOperation(ctx *common.Context, operationID string, data *SystemOperationInput) (*SystemOperationOutput, error) {
+func (s *SystemImpl) ExecuteOperation(ctx *common.Context, operationID string, data *types.SystemOperationInput) (*types.SystemOperationOutput, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
@@ -225,7 +140,7 @@ func (s *SystemImpl) ExecuteOperation(ctx *common.Context, operationID string, d
 	}
 
 	// Check if the component implements Operation interface
-	operation, ok := component.(SystemOperationInterface)
+	operation, ok := component.(types.SystemOperationInterface)
 	if !ok {
 		return nil, fmt.Errorf("failed to execute operation: component %v is not an operation", operation)
 	}
@@ -245,7 +160,7 @@ func (s *SystemImpl) StartService(ctx *common.Context, serviceID string) error {
 		return err
 	}
 	// Check if the component implements SystemServiceInterface interface
-	service, ok := component.(SystemServiceInterface)
+	service, ok := component.(types.SystemServiceInterface)
 	if !ok {
 		return fmt.Errorf("failed to start service: component %v is not a service", service)
 	}
@@ -266,7 +181,7 @@ func (s *SystemImpl) StopService(ctx *common.Context, serviceID string) error {
 		return err
 	}
 	// Check if the component implements SystemServiceInterface interface
-	service, ok := component.(SystemServiceInterface)
+	service, ok := component.(types.SystemServiceInterface)
 	if !ok {
 		return fmt.Errorf("failed to start service: component %v is not a service", service)
 	}

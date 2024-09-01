@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	system "github.com/ebanfa/skeleton/pkg/system"
+	types "github.com/ebanfa/skeleton/pkg/types"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,27 +13,27 @@ type ComponentFactoryInterface struct {
 }
 
 // CreateComponent provides a mock function with given fields: config
-func (_m *ComponentFactoryInterface) CreateComponent(config *system.ComponentConfig) (system.ComponentInterface, error) {
+func (_m *ComponentFactoryInterface) CreateComponent(config *types.ComponentConfig) (types.ComponentInterface, error) {
 	ret := _m.Called(config)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateComponent")
 	}
 
-	var r0 system.ComponentInterface
+	var r0 types.ComponentInterface
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*system.ComponentConfig) (system.ComponentInterface, error)); ok {
+	if rf, ok := ret.Get(0).(func(*types.ComponentConfig) (types.ComponentInterface, error)); ok {
 		return rf(config)
 	}
-	if rf, ok := ret.Get(0).(func(*system.ComponentConfig) system.ComponentInterface); ok {
+	if rf, ok := ret.Get(0).(func(*types.ComponentConfig) types.ComponentInterface); ok {
 		r0 = rf(config)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(system.ComponentInterface)
+			r0 = ret.Get(0).(types.ComponentInterface)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(*system.ComponentConfig) error); ok {
+	if rf, ok := ret.Get(1).(func(*types.ComponentConfig) error); ok {
 		r1 = rf(config)
 	} else {
 		r1 = ret.Error(1)

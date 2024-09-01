@@ -4,22 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+
+	"github.com/ebanfa/skeleton/pkg/types"
 )
-
-// MultiStore is a multi-store interface that manages multiple key-value stores.
-type MultiStore interface {
-	Store
-
-	// GetStoreCount returns the total number of stores in the multistore.
-	GetStoreCount() int
-
-	// GetStore returns the store with the given namespace.
-	GetStore(namespace []byte) Store
-
-	// Creates and adds a new store with the given namespace.
-	// If a store with the same namespace already exists, it returns an error.
-	CreateStore(namespace string) (Store, bool, error)
-}
 
 // StoreMetaData contains metadata for a store.
 type StoreMetaData struct {
@@ -30,26 +17,26 @@ type StoreMetaData struct {
 
 // MultiStoreImpl is a concrete implementation of the MultiStore interface.
 type MultiStoreImpl struct {
-	Store                         // Embedding Store to satisfy the Store interface
-	stores       map[string]Store // Map to store metadata of stores
+	types.Store                         // Embedding Store to satisfy the Store interface
+	stores       map[string]types.Store // Map to store metadata of stores
 	mutex        sync.RWMutex
 	storeFactory StoreFactory
 }
 
 // NewMultiStore creates a new instance of MultiStoreImpl with the provided store options.
-func NewMultiStore(store Store, storeFactory StoreFactory) (MultiStore, error) {
+func NewMultiStore(store types.Store, storeFactory StoreFactory) (types.MultiStore, error) {
 	// Return a new instance of MultiStoreImpl with the embedded Store instance,
 	// along with other necessary fields initialized
 	return &MultiStoreImpl{
-		Store:        store,                  // Embed the Store instance to satisfy the Store interface
-		stores:       make(map[string]Store), // Initialize the map to store metadata of stores
+		Store:        store,                        // Embed the Store instance to satisfy the Store interface
+		stores:       make(map[string]types.Store), // Initialize the map to store metadata of stores
 		storeFactory: storeFactory,
 	}, nil
 }
 
 // GetStore returns the store with the given namespace.
 // If the store doesn't exist, it returns an error.
-func (ms *MultiStoreImpl) GetStore(namespace []byte) Store {
+func (ms *MultiStoreImpl) GetStore(namespace []byte) types.Store {
 	// Lock the mutex to prevent concurrent access to the map
 	ms.mutex.Lock()
 	defer ms.mutex.Unlock() // Unlock the mutex when the function exits
@@ -77,7 +64,7 @@ func (ms *MultiStoreImpl) GetStoreCount() int {
 
 // CreateStore creates and initializes a new store with the given namespace and options.
 // If a store with the same namespace already exists, it returns an error.
-func (ms *MultiStoreImpl) CreateStore(namespace string) (Store, bool, error) {
+func (ms *MultiStoreImpl) CreateStore(namespace string) (types.Store, bool, error) {
 	ms.mutex.Lock()
 	defer ms.mutex.Unlock()
 
@@ -109,7 +96,7 @@ func (ms *MultiStoreImpl) Load() (int64, error) {
 	defer ms.mutex.Unlock()
 
 	// Clear existing stores
-	ms.stores = make(map[string]Store)
+	ms.stores = make(map[string]types.Store)
 
 	// Load the database
 	version, err := ms.Store.Load()

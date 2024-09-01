@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	store "github.com/ebanfa/skeleton/pkg/store"
+	types "github.com/ebanfa/skeleton/pkg/types"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -51,24 +51,24 @@ func (_m *MultiStore) Close() error {
 }
 
 // CreateStore provides a mock function with given fields: namespace
-func (_m *MultiStore) CreateStore(namespace string) (store.Store, bool, error) {
+func (_m *MultiStore) CreateStore(namespace string) (types.Store, bool, error) {
 	ret := _m.Called(namespace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateStore")
 	}
 
-	var r0 store.Store
+	var r0 types.Store
 	var r1 bool
 	var r2 error
-	if rf, ok := ret.Get(0).(func(string) (store.Store, bool, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (types.Store, bool, error)); ok {
 		return rf(namespace)
 	}
-	if rf, ok := ret.Get(0).(func(string) store.Store); ok {
+	if rf, ok := ret.Get(0).(func(string) types.Store); ok {
 		r0 = rf(namespace)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(store.Store)
+			r0 = ret.Get(0).(types.Store)
 		}
 	}
 
@@ -136,19 +136,19 @@ func (_m *MultiStore) Get(key []byte) ([]byte, error) {
 }
 
 // GetStore provides a mock function with given fields: namespace
-func (_m *MultiStore) GetStore(namespace []byte) store.Store {
+func (_m *MultiStore) GetStore(namespace []byte) types.Store {
 	ret := _m.Called(namespace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetStore")
 	}
 
-	var r0 store.Store
-	if rf, ok := ret.Get(0).(func([]byte) store.Store); ok {
+	var r0 types.Store
+	if rf, ok := ret.Get(0).(func([]byte) types.Store); ok {
 		r0 = rf(namespace)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(store.Store)
+			r0 = ret.Get(0).(types.Store)
 		}
 	}
 

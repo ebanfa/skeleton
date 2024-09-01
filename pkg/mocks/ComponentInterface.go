@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	system "github.com/ebanfa/skeleton/pkg/system"
+	"github.com/ebanfa/skeleton/pkg/types"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -67,18 +67,18 @@ func (_m *ComponentInterface) Name() string {
 }
 
 // Type provides a mock function with given fields:
-func (_m *ComponentInterface) Type() system.ComponentType {
+func (_m *ComponentInterface) Type() types.ComponentType {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Type")
 	}
 
-	var r0 system.ComponentType
-	if rf, ok := ret.Get(0).(func() system.ComponentType); ok {
+	var r0 types.ComponentType
+	if rf, ok := ret.Get(0).(func() types.ComponentType); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(system.ComponentType)
+		r0 = ret.Get(0).(types.ComponentType)
 	}
 
 	return r0

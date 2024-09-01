@@ -1,11 +1,11 @@
-package store_test
+package db_test
 
 import (
 	"os"
 	"path/filepath"
 
+	"github.com/ebanfa/skeleton/pkg/db"
 	"github.com/ebanfa/skeleton/pkg/mocks"
-	"github.com/ebanfa/skeleton/pkg/store"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("IAVLDatabaseFactory", func() {
 	var (
-		factory *store.IAVLDatabaseFactory
+		factory *db.IAVLDatabaseFactory
 		mockDbm *mocks.Database
 	)
 
@@ -26,7 +26,7 @@ var _ = Describe("IAVLDatabaseFactory", func() {
 	Describe("CreateDatabase", func() {
 		Context("when creation is successful", func() {
 			BeforeEach(func() {
-				factory = store.NewIAVLDatabaseFactory()
+				factory = db.NewIAVLDatabaseFactory()
 			})
 
 			It("should create a database without error", func() {

@@ -1,71 +1,32 @@
-package system
+package component
 
 import (
 	"fmt"
 	"sync"
 
 	"github.com/ebanfa/skeleton/pkg/common"
+	"github.com/ebanfa/skeleton/pkg/types"
 )
-
-// ComponentCreationInfo encapsulates the necessary information to create a component.
-type ComponentCreationInfo struct {
-	Config  *ComponentConfig
-	Factory ComponentFactoryInterface
-}
-
-// ComponentRegistrarInterface defines the registry functionality for components and factories.
-type ComponentRegistrarInterface interface {
-	// GetComponentsByType retrieves components of the specified type.
-	// It returns a list of components and an error if the type is not found or other error.
-	GetComponentsByType(componentType ComponentType) []ComponentInterface
-
-	// GetComponent retrieves the component with the specified ID.
-	// It returns the component and an error if the component ID is not found or other error.
-	GetComponent(id string) (ComponentInterface, error)
-
-	// GetAllComponents returns a list of all registered components.
-	GetAllComponents() []ComponentInterface
-
-	// GetFactory retrieves the factory with the specified ID.
-	// It returns the factory and an error if the factory ID is not found or other error.
-	GetFactory(id string) (ComponentFactoryInterface, error)
-
-	// RegisterFactory registers a factory with the given ID.
-	// It returns an error if the registration fails.
-	RegisterFactory(ctx *common.Context, id string, factory ComponentFactoryInterface) error
-
-	// UnregisterFactory unregisters a factory with the specified ID.
-	// It returns an error if the ID is not found or other error.
-	UnregisterFactory(ctx *common.Context, id string) error
-
-	// CreateComponent creates a component with the given ID and factory ID.
-	// It returns the created component and an error if the creation fails.
-	CreateComponent(ctx *common.Context, config *ComponentConfig) (ComponentInterface, error)
-
-	// RemoveComponent removes a component with the specified ID from the registry.
-	// It returns an error if the ID is not found or other error.
-	RemoveComponent(ctx *common.Context, id string) error
-}
 
 // ComponentRegistrar defines the registry functionality for components and factories.
 type ComponentRegistrar struct {
-	ComponentRegistrarInterface
+	types.ComponentRegistrarInterface
 	factoriesMutex  sync.RWMutex
 	componentsMutex sync.RWMutex
-	factories       map[string]ComponentFactoryInterface
-	components      map[string]ComponentInterface
+	factories       map[string]types.ComponentFactoryInterface
+	components      map[string]types.ComponentInterface
 }
 
 // NewComponentRegistrar creates a new instance of ComponentRegistrar.
 func NewComponentRegistrar() *ComponentRegistrar {
 	return &ComponentRegistrar{
-		factories:  make(map[string]ComponentFactoryInterface),
-		components: make(map[string]ComponentInterface),
+		factories:  make(map[string]types.ComponentFactoryInterface),
+		components: make(map[string]types.ComponentInterface),
 	}
 }
 
 // GetComponent retrieves the component with the specified ID.
-func (cr *ComponentRegistrar) GetComponent(id string) (ComponentInterface, error) {
+func (cr *ComponentRegistrar) GetComponent(id string) (types.ComponentInterface, error) {
 	cr.componentsMutex.RLock()
 	defer cr.componentsMutex.RUnlock()
 
@@ -78,13 +39,13 @@ func (cr *ComponentRegistrar) GetComponent(id string) (ComponentInterface, error
 }
 
 // GetComponentsByType retrieves components of the specified type.
-func (cr *ComponentRegistrar) GetComponentsByType(componentType ComponentType) []ComponentInterface {
+func (cr *ComponentRegistrar) GetComponentsByType(componentType types.ComponentType) []types.ComponentInterface {
 	// Lock the components mutex for reading to prevent concurrent access while reading
 	cr.componentsMutex.RLock()
 	defer cr.componentsMutex.RUnlock()
 
 	// Initialize an empty slice to store components of the specified type
-	components := []ComponentInterface{}
+	components := []types.ComponentInterface{}
 
 	// Iterate over all registered components
 	for _, component := range cr.components {
@@ -100,13 +61,13 @@ func (cr *ComponentRegistrar) GetComponentsByType(componentType ComponentType) [
 }
 
 // GetAllComponents returns a list of all registered components.
-func (cr *ComponentRegistrar) GetAllComponents() []ComponentInterface {
+func (cr *ComponentRegistrar) GetAllComponents() []types.ComponentInterface {
 	// Lock the components mutex for reading to prevent concurrent access while reading
 	cr.componentsMutex.RLock()
 	defer cr.componentsMutex.RUnlock()
 
 	// Initialize an empty slice to store all registered components
-	allComponents := make([]ComponentInterface, 0, len(cr.components))
+	allComponents := make([]types.ComponentInterface, 0, len(cr.components))
 
 	// Iterate over all registered components
 	for _, component := range cr.components {
@@ -119,7 +80,7 @@ func (cr *ComponentRegistrar) GetAllComponents() []ComponentInterface {
 }
 
 // GetFactory retrieves the factory with the specified ID.
-func (cr *ComponentRegistrar) GetFactory(id string) (ComponentFactoryInterface, error) {
+func (cr *ComponentRegistrar) GetFactory(id string) (types.ComponentFactoryInterface, error) {
 	// Lock the factories mutex for reading to prevent concurrent access while reading
 	cr.factoriesMutex.RLock()
 	defer cr.factoriesMutex.RUnlock()
@@ -133,13 +94,13 @@ func (cr *ComponentRegistrar) GetFactory(id string) (ComponentFactoryInterface, 
 }
 
 // GetAllFactories returns a list of all registered component factories.
-func (cr *ComponentRegistrar) GetAllFactories() []ComponentFactoryInterface {
+func (cr *ComponentRegistrar) GetAllFactories() []types.ComponentFactoryInterface {
 	// Lock the factories mutex for reading to prevent concurrent access while reading
 	cr.factoriesMutex.RLock()
 	defer cr.factoriesMutex.RUnlock()
 
 	// Initialize an empty slice to store all registered factories
-	allFactories := make([]ComponentFactoryInterface, 0, len(cr.factories))
+	allFactories := make([]types.ComponentFactoryInterface, 0, len(cr.factories))
 
 	// Iterate over all registered factories
 	for _, factory := range cr.factories {
@@ -152,7 +113,7 @@ func (cr *ComponentRegistrar) GetAllFactories() []ComponentFactoryInterface {
 }
 
 // CreateComponent creates and registers a new instance of the component.
-func (cr *ComponentRegistrar) CreateComponent(ctx *common.Context, config *ComponentConfig) (ComponentInterface, error) {
+func (cr *ComponentRegistrar) CreateComponent(ctx *common.Context, config *types.ComponentConfig) (types.ComponentInterface, error) {
 	cr.factoriesMutex.RLock()
 	defer cr.factoriesMutex.RUnlock()
 
@@ -177,7 +138,7 @@ func (cr *ComponentRegistrar) CreateComponent(ctx *common.Context, config *Compo
 }
 
 // RegisterFactory registers a factory with the given ID.
-func (cr *ComponentRegistrar) RegisterFactory(ctx *common.Context, id string, factory ComponentFactoryInterface) error {
+func (cr *ComponentRegistrar) RegisterFactory(ctx *common.Context, id string, factory types.ComponentFactoryInterface) error {
 	cr.factoriesMutex.Lock()
 	defer cr.factoriesMutex.Unlock()
 

@@ -7,6 +7,7 @@ import (
 
 	"github.com/ebanfa/skeleton/pkg/mocks"
 	"github.com/ebanfa/skeleton/pkg/store"
+	"github.com/ebanfa/skeleton/pkg/types"
 )
 
 const (
@@ -18,7 +19,7 @@ var _ = Describe("MultiStore", func() {
 	var (
 		mockStore        *mocks.Store
 		mockStoreFactory *mocks.StoreFactory
-		ms               store.MultiStore
+		ms               types.MultiStore
 	)
 
 	BeforeEach(func() {

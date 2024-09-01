@@ -1,10 +1,14 @@
-package store
+package db
 
 import (
 	"sync"
 
 	"github.com/cosmos/iavl"
 )
+
+type MutableTree interface {
+	iavl.MutableTree
+}
 
 // IAVLDatabase wraps an IAVL+ tree to implement the Database interface.
 type IAVLDatabase struct {

@@ -1,8 +1,8 @@
-package store_test
+package db_test
 
 import (
 	"github.com/cosmos/iavl"
-	"github.com/ebanfa/skeleton/pkg/store"
+	"github.com/ebanfa/skeleton/pkg/db"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -13,12 +13,12 @@ import (
 var _ = Describe("IAVLDatabase", func() {
 	var (
 		iavlTree *iavl.MutableTree
-		mockDB   *store.IAVLDatabase
+		mockDB   *db.IAVLDatabase
 	)
 
 	BeforeEach(func() {
 		iavlTree = iavl.NewMutableTree(iavldb.NewMemDB(), 100, false, log.NewNopLogger())
-		mockDB = store.NewIAVLDatabase(iavlTree)
+		mockDB = db.NewIAVLDatabase(iavlTree)
 	})
 
 	Describe("Get", func() {

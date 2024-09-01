@@ -1,11 +1,4 @@
-package store
-
-import "errors"
-
-// Create a new error
-var (
-	ErrStoreNotFound = errors.New("Store not found")
-)
+package types
 
 // ReadOnlyDatabase provides methods for reading data from the database.
 type ReadOnlyDatabase interface {
@@ -77,15 +70,4 @@ type Database interface {
 
 	// Close closes the database.
 	Close() error
-}
-
-// Store represents a database store.
-type Store interface {
-	Database
-
-	// Name returns the name of the store.
-	Name() string
-
-	// Path returns the path of the store.
-	Path() string
 }

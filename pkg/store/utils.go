@@ -5,6 +5,7 @@ import (
 	"unicode"
 
 	"github.com/ebanfa/skeleton/pkg/common"
+	"github.com/ebanfa/skeleton/pkg/types"
 )
 
 func GenererateStorageInfo(name string, databasesDir string) (string, string) {
@@ -18,7 +19,7 @@ func GenerateStoreId(name string) string {
 	return common.HashSHA256(name)
 }
 
-func CreateMultiStore(name, databasesDir string, storeFactory StoreFactory) (MultiStore, error) {
+func CreateMultiStore(name, databasesDir string, storeFactory StoreFactory) (types.MultiStore, error) {
 
 	internalStore, err := storeFactory.CreateStore(name)
 

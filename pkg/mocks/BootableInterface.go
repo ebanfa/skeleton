@@ -4,6 +4,7 @@ package mocks
 
 import (
 	common "github.com/ebanfa/skeleton/pkg/common"
+
 	mock "github.com/stretchr/testify/mock"
 )
 

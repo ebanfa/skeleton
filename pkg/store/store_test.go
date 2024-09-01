@@ -6,6 +6,7 @@ import (
 
 	"github.com/ebanfa/skeleton/pkg/mocks"
 	"github.com/ebanfa/skeleton/pkg/store"
+	"github.com/ebanfa/skeleton/pkg/types"
 )
 
 const (
@@ -35,7 +36,7 @@ var _ = Describe("StoreImpl", func() {
 
 			It("should return an error when database is nil", func() {
 				// Arrange
-				var nilDb store.Database
+				var nilDb types.Database
 
 				// Act
 				createdStore, err := store.NewStoreImpl(MockDbName, MockDbPath, nilDb)

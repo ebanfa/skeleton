@@ -1,6 +1,13 @@
-package system
+package types
 
-import "errors"
+import (
+	"errors"
+)
+
+// Create a new error
+var (
+	ErrStoreNotFound = errors.New("Store not found")
+)
 
 // Custom errors
 var (
