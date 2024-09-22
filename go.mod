@@ -44,7 +44,6 @@ require (
 require (
 	cosmossdk.io/log v1.4.1
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
-	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/cosmos/iavl v1.3.0
 	golang.org/x/sys v0.23.0 // indirect
 )

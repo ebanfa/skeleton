@@ -1,4 +1,4 @@
-package system_test
+package plugin_test
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package system_test
+package plugin_test
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/ebanfa/skeleton/pkg/common"
 	"github.com/ebanfa/skeleton/pkg/mocks"
-	system "github.com/ebanfa/skeleton/pkg/plugin"
+	plugin "github.com/ebanfa/skeleton/pkg/plugin"
 	"github.com/ebanfa/skeleton/pkg/types"
 )
 
@@ -21,7 +21,7 @@ var _ = Describe("PluginManager", func() {
 	)
 
 	BeforeEach(func() {
-		pluginManager = system.NewPluginManager()
+		pluginManager = plugin.NewPluginManager()
 		ctx = &common.Context{}
 		mockPlugin = new(mocks.PluginInterface)
 	})

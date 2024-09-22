@@ -10,6 +10,7 @@ import (
 
 // BaseSystemService.
 type BaseSystemService struct {
+	types.SystemServiceInterface
 	BaseSystemComponent
 }
 
