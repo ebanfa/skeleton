@@ -64,6 +64,13 @@ type ComponentFactoryInterface interface {
 	CreateComponent(config *ComponentConfig) (ComponentInterface, error)
 }
 
+// Utility type to help with component registration
+type FactoryConfig struct {
+	FactoryId    string
+	ComponentIDs []string
+	Factory      ComponentFactoryInterface
+}
+
 // ComponentRegistrarInterface defines the registry functionality for components and factories.
 type ComponentRegistrarInterface interface {
 	// GetComponentsByType retrieves components of the specified type.
